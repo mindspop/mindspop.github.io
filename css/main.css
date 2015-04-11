@@ -1078,7 +1078,9 @@ input.menu-search-input {
   margin: 0 auto;
   max-width: 96px;
   height: auto;
-  border: 2px solid #333;
+  border: none;
+  border-radius: 50px;
+  margin: 20px auto;
   padding: 2px;
 }
 .site-author-name {
@@ -1153,7 +1155,7 @@ input.menu-search-input {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #6effe8;
+  background: #c7ff52;
 }
 .sidebar-nav {
   margin: 0;
