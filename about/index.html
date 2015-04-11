@@ -1,0 +1,271 @@
+<!doctype html>
+<html class="theme-next  theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+
+    <meta name="keywords" content="mindspop,html,css,tech,web,blog,js,jQuery,Backbone,React,design" />
+
+
+
+
+
+    <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title>
+  
+
+  
+    about // Mindspop's Blog
+  
+</title>
+</head>
+
+<body>
+  <div class="container one-column ">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">Mindspop's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+    
+      <p>博客从 WordPress 叛逃到 GitHub Pages，然后又从 Jekyll 叛逃到 Hexo「 因为 Node.js，^_^ 」， 在这里重新开始记录一些技术内容，偶尔写点生活感悟。</p>
+<p>联系方式：</p>
+<p>Mindspop#gmail.com 「# 换成 @」</p>
+<p><a href="http://weibo.com/mindspop/" title="Mindspop's weibo" class="profile-link" target="_blank"><img src="http://www.weibo.com/favicon.ico" alt="" width="25"></a><a href="http://www.douban.com/people/mindspop/" target="_blank" class="profile-link" title="Mindspop's douban"><img src="http://www.douban.com/favicon.ico" alt="" width="22"></a><a href="https://github.com/mindspop" title="Mindspop's GitHub" class="profile-link" target="_blank"><img src="http://www.github.com/favicon.ico" alt="" width="22"></a></p>
+
+    
+  </div>
+
+
+        </div>
+      </div>
+
+      
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">Mindspop</span>
+</div>
+
+<div class="powered-by">
+  基于 <a class="theme-link" href="http://hexo.io">Hexo</a> 搭建 
+</div>
+
+<div class="theme-info">
+  主题设计 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" id="motion.fallback">
+  $(document).ready(function () {
+    var isSidebarVisible;
+    var DURATION = 300;
+    var SIDEBAR_WIDTH = 320;
+
+    sidebar();
+    backToTop();
+
+    function sidebar() {
+      $('.sidebar-toggle').on('click', function () {
+        var sidebarWidth = isSidebarVisible ? 0 : SIDEBAR_WIDTH;
+        $('.sidebar').animate({
+          width: sidebarWidth
+        }, DURATION);
+        isSidebarVisible = !isSidebarVisible;
+      });
+    }
+
+    function backToTop() {
+      $('.back-to-top').on('click', function () {
+        $('html, body').animate({
+          scrollTop: 0
+        }, DURATION);
+      });
+    }
+
+  });
+</script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-61780814-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>

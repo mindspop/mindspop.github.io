@@ -1,0 +1,549 @@
+<!doctype html>
+<html class="theme-next  theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.2"/>
+
+
+
+
+
+    <meta name="keywords" content="mindspop,html,css,tech,web,blog,js,jQuery,Backbone,React,design" />
+
+
+
+
+
+    <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.2" />
+
+
+
+
+  <title> Mindspop's Blog </title>
+</head>
+
+<body>
+  <div class="container one-column 
+   page-home 
+">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">Mindspop's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-tags">
+        <a href="/tags">
+          <i class="menu-item-icon icon-tags"></i> <br />
+          标签
+        </a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+  <div id="posts" class="posts-expand">
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2014/08/30/元素在Z轴方向上的堆叠顺序规则分析/">
+                元素在 Z 轴方向上的堆叠顺序规则分析
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2014-08-29
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; 分类于
+            
+              <a href="/categories/CSS-Tech/">CSS Tech</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2014/08/30/元素在Z轴方向上的堆叠顺序规则分析/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2014/08/30/元素在Z轴方向上的堆叠顺序规则分析/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <p>在正式开始介绍前，我们先提出这样一个疑问：</p>
+<blockquote>
+<p>当两个元素位置互相堆叠在一起时，CSS 样式是如何决定哪个元素显示在前，哪个元素显示在后的呢？</p>
+</blockquote>
+<p>为了解决这个问题，在左右、上下的布局基础上，CSS 2.1 引入了第三维度<code>Z 轴</code>的概念。CSS 将所有元素都被纳入一个<code>Stacking Context</code>中，根据某种规则控制元素堆叠的优先顺序，下面主要详细介绍一下这种规则。</p>
+<h2 id="Stacking_Context_介绍">Stacking Context 介绍</h2><p>CSS 2.1 Spec 对<code>Stacking Context</code>的描述：</p>
+<blockquote>
+<p>The order in which the rendering tree is painted onto the canvas is described in terms of stacking contexts.</p>
+</blockquote>
+<p>我对这句话的理解是：<code>Stacking Context</code>有着一套规范元素堆叠顺序的规则。在渲染页面时，根据这套顺序规则依次在 Z 轴上显示不同元素。</p>
+<h3 id="Stacking_Context_的特性">Stacking Context 的特性</h3><ul>
+<li>每个文档布局中存在多个 <code>Stacking Context</code>。而产生一个新的 <code>Stacking Context</code> 是有条件的「详见下文」</li>
+<li>在每个<code>Stacking Context</code>中可以嵌套其它的<code>Stacking Context</code></li>
+<li>每个<code>Stacking Context</code>中的元素位置和同级的<code>Stacking Context</code>中元素位置的顺序是互相独立的</li>
+<li>每个<code>Stacking Context</code>是自包含的，即当父元素形成一个<code>Stacking Context</code>「此时作为后代元素的<code>Parent Stacking Context</code>」，所有内部后代元素的堆叠顺序都仅限在<code>Parent Stacking Context</code>比较</li>
+</ul>
+<h3 id="Stacking_Context_内部元素排列顺序规则">Stacking Context 内部元素排列顺序规则</h3><p>按抵部-&gt;顶部顺序，可以抽象成七层布局：</p>
+<img src="/2014/08/30/元素在Z轴方向上的堆叠顺序规则分析/stacking-context-order.png">
+<h3 id="归属于不同_Stacking_Context_的元素顺序比较">归属于不同 Stacking Context 的元素顺序比较</h3><p>上面介绍的堆叠顺序规则只用于比较同属于一个<code>Parent Stacking Context</code>的元素堆叠顺序。如果两个元素属于两个不同的<code>Parent Stacking Context</code>，那么它俩的顺序是由<code>Parent Stacking Context</code>的顺序决定的。</p>
+<p>这句话说的有点绕，我们用图例来解释：</p>
+<img src="/2014/08/30/元素在Z轴方向上的堆叠顺序规则分析/parent-stacking-context.png">
+<p>从图例中可以看到，<code>DIV #2.1</code>元素位置在<code>DIV #1.1</code>和<code>DIV #1.2</code>之下，尽管它的<code>z-index</code>值为 100。产生这个现象的原因就是因为<code>DIV #2.1</code>和<code>DIV #1.1</code>不在同一个<code>Parent Stacking Context</code>。所以此时需要找到<code>DIV #2.1</code>的<code>Parent Stacking Context</code>，即为<code>DIV #2</code>，此时比较<code>DIV #2</code>和<code>DIV #1.1</code>的堆叠顺序，因为<code>DIV #2</code>的<code>z-index</code>值为 1，所以它在<code>DIV #1.1</code>元素的下方，同时<code>DIV #2.1</code>的位置顺序受限于<code>DIV #2</code>，最后的排布顺序就如图所示。</p>
+<blockquote>
+<p><strong>图例解释说明：</strong></p>
+<ul>
+<li>DIV #n，#n.n，#n.n.n 表示互为父-子元素关系，具体<code>HTML</code>结构层次：</li>
+</ul>
+<blockquote>
+<ul>
+<li>Body<ul>
+<li>DIV #1<ul>
+<li>DIV #1.1<ul>
+<li>DIV #1.2</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>DIV #2<pre><code>* <span class="keyword">DIV</span> <span class="string">#2</span>.<span class="number">1</span>
+  * <span class="keyword">DIV</span> <span class="string">#2</span>.<span class="number">1.1</span>
+   * <span class="keyword">DIV</span> <span class="string">#2</span>.<span class="number">1.2</span>
+</code></pre></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<ul>
+<li>绿色背景表示根元素「即<code>&lt;html&gt;</code>」产生的<code>Stacking Context</code></li>
+<li>颜色相同的元素表示它们同属于一个<code>Parent Stacking Context</code>，<code>Stacking Context</code>层次关系：</li>
+</ul>
+<blockquote>
+<ul>
+<li>Root<ul>
+<li>DIV #1</li>
+<li>DIV #1.1</li>
+<li>DIV #1.2 </li>
+<li>DIV #2<ul>
+<li>DIV #2.1<ul>
+<li>DIV 2.1.1</li>
+<li>DIV 2.1.2</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+</blockquote>
+<p>既然元素处于哪个<code>Parent Stacking Context</code>也会影响元素显示顺序，那么我们来看看元素的<code>Parent Stacking Context</code>是如何产生的：</p>
+<blockquote>
+<p>最外层的<code>Stacking Context</code>是根元素产生的，那么我们可以理解为它是所有元素的<code>Parent Stacking Context</code>。但当有新的<code>Stacking Context</code>产生时，这个新<code>Stacking Context</code>就是所有后代元素的<code>Parent Stacking Context</code>。以此类推，每当父元素产生一个新<code>Stacking Context</code>，就给后代元素提供了一个<code>Parent Stacking Context</code>。</p>
+</blockquote>
+<h3 id="产生新_Stacking_Context_的条件">产生新 Stacking Context 的条件</h3><ul>
+<li><code>Root element</code>「可以理解为第一个<code>Stacking Context</code>，用来包含其它的<code>Stacking Context</code>」</li>
+<li><code>Positioned</code>元素的<code>z-index</code>值不是<code>auto</code></li>
+<li>元素的<code>Opacity</code>值小于 1「可以看作是给普通元素增加了<code>Position</code>属性，且<code>z-index</code>值为 0「详细可见 <a href="http://www.w3.org/TR/css3-color/#transparency" target="_blank" rel="external">CSS Spec 2.1</a>」</li>
+<li>Chrome 22+ 和 Mobile WebKit,<code>z-index</code>值为<code>auto</code>的<code>fixed position</code>元素</li>
+</ul>
+<h2 id="Positioned_元素堆叠顺序规则">Positioned 元素堆叠顺序规则</h2><p>上面介绍了每一个<code>Stacking Context</code>内部元素的堆叠顺序，这里进一步详细介绍<code>Positioned</code>元素的堆叠顺序。</p>
+<h3 id="z-index_的作用">z-index 的作用</h3><p><code>Positioned</code>元素的堆叠顺序是由<code>z-index</code>决定的。<code>z-index</code>有2个作用：</p>
+<ol>
+<li>决定<code>Positioned</code>元素的<code>Stack Level</code>「可以理解为堆叠优先级，<code>Stack Level</code>值为整数，值大的放在上层」</li>
+<li>决定是否形成一个新的<code>Stacking Context</code></li>
+</ol>
+<h3 id="z-index_属性值">z-index 属性值</h3><p><code>z-index</code> 有两个属性值：<code>&lt;integer&gt;</code>和<code>&lt;auto&gt;</code>「注：只有<code>Positioned</code>元素的<code>Z-index</code>值才有效」。</p>
+<ul>
+<li><code>&lt;integer&gt;</code>：当<code>Z-index</code>设置了一个整数「负整数，零，正整数」时，<code>Positioned</code>元素就产生了一个新的<code>Stacking Context</code>，同时这个整数代表了当前元素的<code>Stack Level</code></li>
+<li><code>&lt;auto&gt;</code>：该值说明当前元素的<code>Stack Level</code>值为 0。但此时并没有产生新的<code>Stacking Context</code>，除非这个元素是个根元素「注：这里可以看出<code>z-index = auto</code>和<code>z-index = 0</code>的区别」</li>
+</ul>
+<h2 id="总结">总结</h2><ol>
+<li>任意一个元素都归属一个<code>Stacking Context</code>，<code>Stacking Context</code>可以互相嵌套，从而形成一个<code>Stacking Context</code>层级体系。「<code>Root element</code>是一个初始的<code>Stacking Context</code>，它包裹了其它的<code>Stacking Context</code>」</li>
+<li>在每一个<code>Stacking Context</code>内部，有特定堆叠优先级规则决定不同类型元素的堆叠顺序「<code>Positioned</code>元素的堆叠顺序由<code>z-index</code>值决定」</li>
+<li>当两个元素归属于不同的<code>Parent Stacking Context</code>时，它们的堆叠顺序互不干扰</li>
+</ol>
+<h3 id="参考资料">参考资料</h3><ol>
+<li><a href="http://www.w3.org/TR/CSS21/zindex.html" target="_blank" rel="external">http://www.w3.org/TR/CSS21/zindex.html</a></li>
+<li><a href="http://www.w3.org/TR/CSS21/visuren.html#layers" target="_blank" rel="external">http://www.w3.org/TR/CSS21/visuren.html#layers</a></li>
+<li><a href="http://www.w3.org/TR/css3-color/#transparency" target="_blank" rel="external">http://www.w3.org/TR/css3-color/#transparency</a></li>
+<li><a href="http://segmentfault.com/a/1190000000460664" target="_blank" rel="external">http://segmentfault.com/a/1190000000460664</a></li>
+<li><a href="http://gbspacing.com/z-index.gb" target="_blank" rel="external">http://gbspacing.com/z-index.gb</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index</a></li>
+</ol>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/css/"> #css </a>
+          
+        </div>
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+  </div>
+
+  
+
+        </div>
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/avatar.jpg" alt="Mindspop" />
+          <p class="site-author-name">Mindspop</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/mindspop" target="_blank">GitHub</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://weibo.com/mindspop/" target="_blank">Weibo</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.douban.com/people/mindspop/" target="_blank">DouBan</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.zhihu.com/people/zhu-chao-qiang" target="_blank">ZhiHu</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+      </div>
+
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp;  2014 - 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">Mindspop</span>
+</div>
+
+<div class="powered-by">
+  基于 <a class="theme-link" href="http://hexo.io">Hexo</a> 搭建 
+</div>
+
+<div class="theme-info">
+  主题设计 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" id="motion.fallback">
+  $(document).ready(function () {
+    var isSidebarVisible;
+    var DURATION = 300;
+    var SIDEBAR_WIDTH = 320;
+
+    sidebar();
+    backToTop();
+
+    function sidebar() {
+      $('.sidebar-toggle').on('click', function () {
+        var sidebarWidth = isSidebarVisible ? 0 : SIDEBAR_WIDTH;
+        $('.sidebar').animate({
+          width: sidebarWidth
+        }, DURATION);
+        isSidebarVisible = !isSidebarVisible;
+      });
+    }
+
+    function backToTop() {
+      $('.back-to-top').on('click', function () {
+        $('html, body').animate({
+          scrollTop: 0
+        }, DURATION);
+      });
+    }
+
+  });
+</script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"mindspop"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+  
+  <script type="text/javascript">
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-61780814-1');ga('send','pageview');
+  </script>
+
+</body>
+</html>
