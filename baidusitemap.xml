@@ -2,6 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     
+  <url>
+    <loc>mindspop.github.io/2015/04/12/javascript-style-guide/</loc>
+    <lastmod>2015-04-12T14:30:35.000Z</lastmod>
+    <data>
+        <display>
+        <title>JavaScript Style Guide</title>
+        <pubTime>2015-04-11T16:00:00.000Z</pubTime>
+        
+        <tag>JavaScript </tag>
+         
+         
+           
+             
+              <breadCrumb title="JavaScript Tech" url="mindspop.github.io/categories/JavaScript-Tech/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
     
   <url>
     <loc>mindspop.github.io/2014/08/30/stacking-context-analysis-of-element-in-z-axis/</loc>

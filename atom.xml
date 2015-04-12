@@ -4,7 +4,7 @@
   <subtitle><![CDATA[a blog recording something in mind]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="mindspop.github.io/"/>
-  <updated>2015-04-11T16:56:41.000Z</updated>
+  <updated>2015-04-12T14:30:35.000Z</updated>
   <id>mindspop.github.io/</id>
   
   <author>
@@ -13,6 +13,187 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[JavaScript Style Guide]]></title>
+    <link href="mindspop.github.io/2015/04/12/javascript-style-guide/"/>
+    <id>mindspop.github.io/2015/04/12/javascript-style-guide/</id>
+    <published>2015-04-11T16:00:00.000Z</published>
+    <updated>2015-04-12T14:30:35.000Z</updated>
+    <content type="html"><![CDATA[<blockquote>
+<p>前提说明：<br>本文通过对比一些主流 JavaScript Style Guide, 摘录了一些值得借鉴的语法书写方式，以提高程序执行性能。而格式问题「Formatting: space, newline, etc」暂且被忽略了，因为一般可以通过 IDE 编辑器设置处理，写的时候可以按照自己的习惯来，通过编辑器格式配置方式以保持和团队风格统一，常见格式建议可查看<a href="#reference">参考资料</a>。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="变量声明「Variable_Declaration」">变量声明「Variable Declaration」</h2><h3 id="Object">Object</h3><ul>
+<li><p>使用 Literal declaration</p>
+<pre><code><span class="variable"><span class="keyword">var</span> item</span> = {};
+</code></pre></li>
+<li><p>使用同义词替换保留字</p>
+<pre><code><span class="comment">// bad</span>
+<span class="keyword">var</span> superman = {
+  <span class="class"><span class="keyword">class</span>:</span> <span class="symbol">'alie</span>n'
+};
+
+<span class="comment">// bad</span>
+<span class="keyword">var</span> superman = {
+  klass: <span class="symbol">'alie</span>n'
+};
+
+<span class="comment">// good</span>
+<span class="keyword">var</span> superman = {
+  <span class="class"><span class="keyword">type</span>:</span> <span class="symbol">'alie</span>n'
+};
+</code></pre></li>
+</ul>
+<h3 id="Array">Array</h3><pre><code><span class="variable"><span class="keyword">var</span> items</span> = [];
+</code></pre><h3 id="Function">Function</h3><ul>
+<li><p>如果在<code>non-function block</code>(if, while, etc)，声明一个函数，需要把函数赋值给一个变量。「ECMA-262 中定义<code>a list of statements</code>为<code>a block</code>」</p>
+<pre><code><span class="comment">// bad</span>
+<span class="keyword">if</span> (currentUser) {
+    <span class="function"><span class="keyword">function</span> <span class="title">test</span><span class="params">()</span> </span>{
+    <span class="built_in">console</span>.log(<span class="string">'Nope.'</span>);
+    }
+}
+
+<span class="comment">// good</span>
+<span class="keyword">var</span> test;
+<span class="keyword">if</span> (currentUser) {
+  test = <span class="function"><span class="keyword">function</span> <span class="title">test</span><span class="params">()</span> </span>{
+    <span class="built_in">console</span>.log(<span class="string">'Yup.'</span>);
+  };
+}
+</code></pre></li>
+<li>函数参数中不要使用<code>arguments</code>保留字「因为会覆盖 function scope 中的 arguments」</li>
+</ul>
+<h3 id="关于声明提升「Hoisting」">关于声明提升「Hoisting」</h3><ul>
+<li>变量声明会被提前，但是赋值不会</li>
+<li><p>函数声明时，函数名和函数体都会被提前</p>
+<pre><code><span class="function"><span class="keyword">function</span> <span class="title">example</span><span class="params">()</span> </span>{
+
+    <span class="comment">// =&gt; Flying</span>
+      superPower(); 
+
+      <span class="function"><span class="keyword">function</span> <span class="title">superPower</span><span class="params">()</span> </span>{
+        <span class="built_in">console</span>.log(<span class="string">'Flying'</span>);
+      }
+}
+</code></pre></li>
+</ul>
+<h2 id="类型检查「Type_Checking_」">类型检查「Type Checking 」</h2><h3 id="实际类型检测「Actual_Types_Checking」">实际类型检测「Actual Types Checking」</h3><h4 id="Types:_String、Number、Boolean、Object_类型检查">Types: String、Number、Boolean、Object 类型检查</h4><pre><code><span class="comment">// 其实 typeof 返回值一定是一个字符串，这里没必要使用 ===，即使用 == 即可</span>
+<span class="keyword">typeof</span> variable == <span class="string">"Types"</span>
+</code></pre><h4 id="Array-1">Array</h4><pre><code>Array.<span class="function"><span class="title">isArray</span><span class="params">(arrayLikeObject)</span></span>
+</code></pre><h4 id="Node">Node</h4><pre><code><span class="comment">// nodeType 返回值一定是 number，这里没必要使用 ===，即使用 == 即可</span>
+elem<span class="class">.nodeType</span> == <span class="number">1</span>
+</code></pre><h4 id="null">null</h4><pre><code><span class="regexp">//</span> 注意：<span class="keyword">typeof</span> <span class="literal">null</span> 返回的是 “object”
+variable === <span class="literal">null</span>
+</code></pre><h4 id="undefined">undefined</h4><pre><code><span class="comment">// 1. Global Variable</span>
+<span class="comment">// 这里 typeof 返回值也肯定是字符串，所以用 == 即可</span>
+<span class="keyword">typeof</span> variable == <span class="string">"undefined"</span>
+
+<span class="comment">// 2. Local Variable</span>
+variable === <span class="literal">undefined</span>
+</code></pre><h4 id="null_or_undefined">null or undefined</h4><pre><code><span class="comment">// undefined 值可能被重写</span>
+<span class="built_in">variable</span> <span class="subst">==</span> <span class="built_in">null</span>
+</code></pre><h3 id="类型强制转换「Coerced_Types」">类型强制转换「Coerced Types」</h3><blockquote>
+<p>类型转换部分语法原理，可参考这篇文章：<a href="https://javascriptweblog.wordpress.com/2011/02/07/truth-equality-and-javascript/#more-2108" target="_blank" rel="external">Truth, Equality and JavaScript</a></p>
+</blockquote>
+<pre><code><span class="keyword">var</span> number = <span class="number">1</span>,
+ <span class="keyword">string</span> = <span class="string">"1"</span>,
+ <span class="keyword">bool</span> = <span class="keyword">false</span>;
+
+ <span class="comment">// "1"</span>
+ number + <span class="string">""</span>;
+
+ <span class="comment">// 1</span>
+ +<span class="keyword">string</span>;    
+
+ <span class="comment">// 0</span>
+ +<span class="keyword">bool</span>; 
+
+ <span class="comment">// "false"</span>
+ <span class="keyword">bool</span> + <span class="string">""</span>;
+
+ <span class="comment">// "false"     </span>
+ !<span class="keyword">string</span>;
+
+ <span class="comment">// "true"</span>
+ !!number;
+</code></pre><h2 id="条件判断「Conditional_Evaluation」">条件判断「Conditional Evaluation」</h2><h3 id="Booleans,_Truthies_&amp;_Falsies_判断">Booleans, Truthies &amp; Falsies 判断</h3><pre><code><span class="comment">// Booleans:</span>
+<span class="literal">true</span>, <span class="literal">false</span>
+
+<span class="comment">// Truthy:</span>
+<span class="string">"foo"</span>, <span class="number">1</span>, <span class="built_in">Object</span>
+
+<span class="comment">// Falsy:</span>
+<span class="string">""</span>, <span class="number">0</span>, <span class="literal">null</span>, <span class="literal">undefined</span>, <span class="literal">NaN</span>, <span class="keyword">void</span> <span class="number">0</span>
+</code></pre><h3 id="判断数组是否为空">判断数组是否为空</h3><pre><code><span class="comment">// 当数组不为空时</span>
+<span class="keyword">if</span> (<span class="built_in">array</span><span class="built_in">.</span>length) <span class="attribute">...</span>
+
+<span class="comment">// 当数组为空时</span>
+<span class="keyword">if</span> (<span class="subst">!</span><span class="built_in">array</span><span class="built_in">.</span>length) <span class="attribute">...</span>
+</code></pre><h3 id="判断字符串是否为空">判断字符串是否为空</h3><pre><code><span class="comment">// 当字符串不为空时</span>
+<span class="keyword">if</span> (<span class="built_in">string</span>) <span class="attribute">...</span>
+
+<span class="comment">// 当字符串为空时</span>
+<span class="keyword">if</span> (<span class="subst">!</span><span class="built_in">string</span>) <span class="attribute">...</span>
+</code></pre><h3 id="判断引用是否为空「evaluating_a_reference」">判断引用是否为空「evaluating a reference」</h3><pre><code><span class="regexp">//</span> 当引用不为空时
+<span class="keyword">if</span> (foo) ...
+
+<span class="regexp">//</span> 当引用为空时
+<span class="keyword">if</span> (!foo) ...
+
+<span class="regexp">//</span> 除去匹配: <span class="number">0</span>, <span class="string">""</span>, <span class="literal">null</span>, <span class="literal">undefined</span>, NaN 情况，只匹配 boolean <span class="literal">false</span>
+<span class="keyword">if</span> (foo === <span class="literal">false</span>) ...
+
+<span class="regexp">//</span> 只匹配 <span class="literal">null</span> <span class="keyword">or</span> <span class="literal">undefined</span>, 因为 <span class="literal">null</span> == <span class="literal">undefined</span>
+<span class="keyword">if</span> (foo == <span class="literal">null</span>) ...
+</code></pre><h3 id="判断数组中是否存在某元素">判断数组中是否存在某元素</h3><pre><code>array.<span class="function"><span class="title">indexOf</span><span class="params">( <span class="string">"a"</span> )</span></span> &gt;= <span class="number">0</span>
+</code></pre><h2 id="常见操作优化">常见操作优化</h2><h3 id="Array_操作">Array 操作</h3><ul>
+<li>使用 Array.push 而不是直接赋值</li>
+<li>使用 Array.slice 拷贝数组</li>
+<li>使用 Array.prototype.slice.call(arrayLikeObject) 将 array-like 对象转换为数组</li>
+</ul>
+<h3 id="String_操作">String 操作</h3><ul>
+<li>使用 Array.join 拼接字符串</li>
+<li><p>处理长字符串跨行时，用 “+” 拼接字符串</p>
+<pre><code>// bad
+var errorMessage = 'This is a super long error that was thrown because of Batman. When you <span class="operator"><span class="keyword">stop</span> <span class="keyword">to</span> think about how Batman had anything <span class="keyword">to</span> <span class="keyword">do</span> <span class="keyword">with</span> this, you would <span class="keyword">get</span> nowhere <span class="keyword">fast</span>.<span class="string">';
+
+// bad
+var errorMessage = '</span>This <span class="keyword">is</span> a super long error that was thrown because \
+<span class="keyword">of</span> Batman. <span class="keyword">When</span> you <span class="keyword">stop</span> <span class="keyword">to</span> think about how Batman had anything <span class="keyword">to</span> <span class="keyword">do</span> \
+<span class="keyword">with</span> this, you would <span class="keyword">get</span> nowhere \
+<span class="keyword">fast</span>.<span class="string">';
+
+// good
+var errorMessage = '</span>This <span class="keyword">is</span> a super long error that was thrown because <span class="string">' +
+  '</span><span class="keyword">of</span> Batman. <span class="keyword">When</span> you <span class="keyword">stop</span> <span class="keyword">to</span> think about how Batman had anything <span class="keyword">to</span> <span class="keyword">do</span> <span class="string">' +
+  '</span><span class="keyword">with</span> this, you would <span class="keyword">get</span> nowhere <span class="keyword">fast</span>.<span class="string">';</span></span>
+</code></pre></li>
+</ul>
+<h3 id="Object_操作">Object 操作</h3><ul>
+<li>使用<code>.</code>读取字符串属性</li>
+<li>使用<code>[]</code>读取变量数量</li>
+</ul>
+<p><a href="id:reference" target="_blank" rel="external">参考资料</a>：</p>
+<ol>
+<li><a href="https://github.com/rwaldron/idiomatic.js" target="_blank" rel="external">Principles of Writing Consistent, Idiomatic JavaScript</a></li>
+<li><a href="https://github.com/airbnb/javascript" target="_blank" rel="external">Airbnb JavaScript Style Guide</a></li>
+<li><a href="https://javascriptweblog.wordpress.com/2011/02/07/truth-equality-and-javascript/#more-2108" target="_blank" rel="external">Truth, Equality and JavaScript</a></li>
+</ol>
+]]></content>
+    <summary type="html">
+    <![CDATA[<blockquote>
+<p>前提说明：<br>本文通过对比一些主流 JavaScript Style Guide, 摘录了一些值得借鉴的语法书写方式，以提高程序执行性能。而格式问题「Formatting: space, newline, etc」暂且被忽略了，因为一般可以通过 IDE 编辑器设置处理，写的时候可以按照自己的习惯来，通过编辑器格式配置方式以保持和团队风格统一，常见格式建议可查看<a href="#reference">参考资料</a>。</p>
+</blockquote>]]>
+    
+    </summary>
+    
+      <category term="JavaScript" scheme="mindspop.github.io/tags/JavaScript/"/>
+    
+      <category term="JavaScript Tech" scheme="mindspop.github.io/categories/JavaScript-Tech/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[元素在 Z 轴方向上的堆叠顺序规则分析]]></title>
