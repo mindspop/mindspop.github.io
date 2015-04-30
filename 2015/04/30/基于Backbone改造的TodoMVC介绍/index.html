@@ -158,10 +158,11 @@
 <li>使用<code>Webpack</code>工具加载和打包模块</li>
 <li>将 HTML 模板独立成单一模块文件，同时让模块 JS 文件加载对应的 HTML 模板文件</li>
 <li>细化了<code>View</code>层的颗粒度，将 View 拆解成：AppView、FooterView、TodoView、TodoListView</li>
-<li>优化了 View 中<code>render</code>方法监听的事件类型，防止当<code>Model</code>或<code>Collection</code>发生一次变化时，View 多次重复渲染。「原例子中简单监听了<code>all</code>事件」</li>
-</ul>
+<li>优化了 View 中<code>render</code>方法监听的事件类型，防止当<code>Model</code>或<code>Collection</code>发生一次变化时，View 多次重复渲染。「原例子中简单监听了<code>all</code>事件」<a id="more"></a>
 
-<h2 id="TodoMVC_架构分析">TodoMVC 架构分析</h2><h3 id="数据层">数据层</h3><ul>
+</li>
+</ul>
+<h2 id="TodoMVC_架构分析">TodoMVC 架构分析</h2><h3 id="数据层">数据层</h3><ol>
 <li>Todo <code>Model</code><ul>
 <li>存储每一个 Todo Item 的<code>标题</code>和<code>是否完成状态</code></li>
 <li>有一个业务逻辑方法：改变<code>是否完成状态</code></li>
@@ -173,7 +174,7 @@
 <li>负责过滤 Todo 列表中的数据「过滤剩余和完成的 Todo Item」 </li>
 </ul>
 </li>
-</ul>
+</ol>
 <h3 id="View_层">View 层</h3><p>尽可能最小粒度地划分 View，即保证每个独立的 View 对应一个 Model 或 Collection。复杂的 View 由简单的 View 组合而成。这样可以提高开发灵活性，也有利于后期维度。<br>这种细分 View 的方式可以理解为：</p>
 <pre><code>1. <span class="keyword">view</span>-a1 + <span class="keyword">view</span>-a2 = <span class="keyword">view</span>-a
 2. <span class="keyword">view</span>-b1 + <span class="keyword">view</span>-b2 + <span class="keyword">view</span>-b3 + <span class="keyword">view</span>-b4 = <span class="keyword">view</span>-b
@@ -188,8 +189,8 @@
 </li>
 </ul>
 </blockquote>
-<h4 id="本次_TodoMVC_中对_View_的细分处理如下：">本次 TodoMVC 中对 View 的细分处理如下：</h4><ul>
-<li><p>AppView </p>
+<h4 id="本次_TodoMVC_中对_View_的细分处理如下：">本次 TodoMVC 中对 View 的细分处理如下：</h4><ol>
+<li><p>AppView</p>
 <ul>
 <li><p>负责组合所有 APP 内的子 View「判断是否需要增加、显示或隐藏某个组件 View」</p>
 <pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
@@ -247,8 +248,8 @@ renderFooter     : <span class="function"><span class="keyword">function</span> 
 <li>负责 Footer 部分的 View</li>
 </ul>
 </li>
-</ul>
-<h3 id="关联数据层和_View_层">关联数据层和 View 层</h3><ul>
+</ol>
+<h3 id="关联数据层和_View_层">关联数据层和 View 层</h3><ol>
 <li><p>TodoView + Todo Model</p>
 <ul>
 <li><p>将 TodoView 的方法绑定到对应 Todo Model 的事件中</p>
@@ -359,7 +360,7 @@ clearCompleted: <span class="function"><span class="keyword">function</span> <sp
 </code></pre></li>
 </ul>
 </li>
-</ul>
+</ol>
 
       
     </div>
