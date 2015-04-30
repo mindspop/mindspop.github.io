@@ -18,9 +18,9 @@
 
 
 
-	<meta name="keywords" content="css," />
+	<meta name="keywords" content="Backbone,JavaScript,MVC," />
 
-  <title> 元素在 Z 轴方向上的堆叠顺序规则分析 // Mindspop's Blog </title>
+  <title> 基于 Backbone.js 改造的 TodoMVC 介绍 // Mindspop's Blog </title>
 </head>
 
 <body>
@@ -107,7 +107,7 @@
           
           
             
-              元素在 Z 轴方向上的堆叠顺序规则分析
+              基于 Backbone.js 改造的 TodoMVC 介绍
             
           
         </h1>
@@ -115,14 +115,14 @@
 
       <div class="post-meta">
         <span class="post-time">
-          发表于 2014-08-29
+          发表于 2015-04-29
         </span>
 
         
           <span class="post-category">
             &nbsp; | &nbsp; 分类于
             
-              <a href="/categories/CSS-Tech/">CSS Tech</a>
+              <a href="/categories/JavaScript-Tech/">JavaScript Tech</a>
 
               
               
@@ -135,8 +135,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2014/08/30/stacking-context-analysis-of-element-in-z-axis/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2014/08/30/stacking-context-analysis-of-element-in-z-axis/"></span>
+            <a href="/2015/04/30/基于Backbone改造的TodoMVC介绍/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/04/30/基于Backbone改造的TodoMVC介绍/"></span>
             </a>
           </span>
           
@@ -150,108 +150,216 @@
       
 
       
-        <p>在正式开始介绍前，我们先提出这样一个疑问：</p>
-<blockquote>
-<p>当两个元素位置互相堆叠在一起时，CSS 样式是如何决定哪个元素显示在前，哪个元素显示在后的呢？</p>
+        <blockquote>
+<p>前提说明：本篇是在学习<code>Backbone</code>的时候，实战练习写了一个 TodoMVC，并在原有代码上基础做了部分改进工作。</p>
 </blockquote>
-<p>为了解决这个问题，在左右、上下的布局基础上，CSS 2.1 引入了第三维度<code>Z 轴</code>的概念。CSS 将所有元素都被纳入一个<code>Stacking Context</code>中，根据某种规则控制元素堆叠的优先顺序，下面主要详细介绍一下这种规则。</p>
-<h2 id="Stacking_Context_介绍">Stacking Context 介绍</h2><p>CSS 2.1 Spec 对<code>Stacking Context</code>的描述：</p>
-<blockquote>
-<p>The order in which the rendering tree is painted onto the canvas is described in terms of stacking contexts.</p>
-</blockquote>
-<p>我对这句话的理解是：<code>Stacking Context</code>有着一套规范元素堆叠顺序的规则。在渲染页面时，根据这套顺序规则依次在 Z 轴上显示不同元素。</p>
-<h3 id="Stacking_Context_的特性">Stacking Context 的特性</h3><ul>
-<li>每个文档布局中存在多个 <code>Stacking Context</code>。而产生一个新的 <code>Stacking Context</code> 是有条件的「详见下文」</li>
-<li>在每个<code>Stacking Context</code>中可以嵌套其它的<code>Stacking Context</code></li>
-<li>每个<code>Stacking Context</code>中的元素位置和同级的<code>Stacking Context</code>中元素位置的顺序是互相独立的</li>
-<li>每个<code>Stacking Context</code>是自包含的，即当父元素形成一个<code>Stacking Context</code>「此时作为后代元素的<code>Parent Stacking Context</code>」，所有内部后代元素的堆叠顺序都仅限在<code>Parent Stacking Context</code>比较<a id="more"></a>
-<h3 id="Stacking_Context_内部元素排列顺序规则">Stacking Context 内部元素排列顺序规则</h3>按抵部-&gt;顶部顺序，可以抽象成七层布局：</li>
+<h2 id="主要的改进">主要的改进</h2><ul>
+<li>引入模块开发并使用<code>CommonJS</code>规范</li>
+<li>使用<code>Webpack</code>工具加载和打包模块</li>
+<li>将 HTML 模板独立成单一模块文件，同时让模块 JS 文件加载对应的 HTML 模板文件</li>
+<li>细化了<code>View</code>层的颗粒度，将 View 拆解成：AppView、FooterView、TodoView、TodoListView</li>
+<li>优化了 View 中<code>render</code>方法监听的事件类型，防止当<code>Model</code>或<code>Collection</code>发生一次变化时，View 多次重复渲染。「原例子中简单监听了<code>all</code>事件」</li>
 </ul>
-<img src="/2014/08/30/stacking-context-analysis-of-element-in-z-axis/stacking-context-order.png">
-<h3 id="归属于不同_Stacking_Context_的元素顺序比较">归属于不同 Stacking Context 的元素顺序比较</h3><p>上面介绍的堆叠顺序规则只用于比较同属于一个<code>Parent Stacking Context</code>的元素堆叠顺序。如果两个元素属于两个不同的<code>Parent Stacking Context</code>，那么它俩的顺序是由<code>Parent Stacking Context</code>的顺序决定的。</p>
-<p>这句话说的有点绕，我们用图例来解释：</p>
-<img src="/2014/08/30/stacking-context-analysis-of-element-in-z-axis/parent-stacking-context.png">
-<p>从图例中可以看到，<code>DIV #2.1</code>元素位置在<code>DIV #1.1</code>和<code>DIV #1.2</code>之下，尽管它的<code>z-index</code>值为 100。产生这个现象的原因就是因为<code>DIV #2.1</code>和<code>DIV #1.1</code>不在同一个<code>Parent Stacking Context</code>。所以此时需要找到<code>DIV #2.1</code>的<code>Parent Stacking Context</code>，即为<code>DIV #2</code>，此时比较<code>DIV #2</code>和<code>DIV #1.1</code>的堆叠顺序，因为<code>DIV #2</code>的<code>z-index</code>值为 1，所以它在<code>DIV #1.1</code>元素的下方，同时<code>DIV #2.1</code>的位置顺序受限于<code>DIV #2</code>，最后的排布顺序就如图所示。</p>
-<blockquote>
-<p><strong>图例解释说明：</strong></p>
-<ul>
-<li>DIV #n，#n.n，#n.n.n 表示互为父-子元素关系，具体<code>HTML</code>结构层次：</li>
+
+<h2 id="TodoMVC_架构分析">TodoMVC 架构分析</h2><h3 id="数据层">数据层</h3><ul>
+<li>Todo <code>Model</code><ul>
+<li>存储每一个 Todo Item 的<code>标题</code>和<code>是否完成状态</code></li>
+<li>有一个业务逻辑方法：改变<code>是否完成状态</code></li>
 </ul>
-<blockquote>
-<ul>
-<li>Body<ul>
-<li>DIV #1<ul>
-<li>DIV #1.1<ul>
-<li>DIV #1.2</li>
+</li>
+<li>Todos <code>Collection</code><ul>
+<li>是一组 Todo Model 的集合</li>
+<li>负责 Todo 列表的排序</li>
+<li>负责过滤 Todo 列表中的数据「过滤剩余和完成的 Todo Item」 </li>
 </ul>
 </li>
 </ul>
+<h3 id="View_层">View 层</h3><p>尽可能最小粒度地划分 View，即保证每个独立的 View 对应一个 Model 或 Collection。复杂的 View 由简单的 View 组合而成。这样可以提高开发灵活性，也有利于后期维度。<br>这种细分 View 的方式可以理解为：</p>
+<pre><code>1. <span class="keyword">view</span>-a1 + <span class="keyword">view</span>-a2 = <span class="keyword">view</span>-a
+2. <span class="keyword">view</span>-b1 + <span class="keyword">view</span>-b2 + <span class="keyword">view</span>-b3 + <span class="keyword">view</span>-b4 = <span class="keyword">view</span>-b
+3. <span class="keyword">view</span>-a + <span class="keyword">view</span>-b + <span class="keyword">view</span>-c = <span class="keyword">view</span>-<span class="literal">d</span>
+</code></pre><p>这种划分的规则:</p>
+<blockquote>
+<ul>
+<li>每一个最小单位的 View 都只负责处理自身的内容</li>
+<li>由其它子 View 组合而成的 View 则负责统筹更小单位的 View「通常父层级的 View 负责创建、显示、隐藏或删除子级别 View」<ul>
+<li>View 与 View 之间的通信，则依靠 Model 或 Collection 这个中间体「比如用户操作某个 View1 而影响另外一个 View2，代码实现上是通过修改 View2 对应的数据层来间接刷新 View2」</li>
+</ul>
 </li>
-<li>DIV #2<pre><code>* <span class="keyword">DIV</span> <span class="string">#2</span>.<span class="number">1</span>
-  * <span class="keyword">DIV</span> <span class="string">#2</span>.<span class="number">1.1</span>
-   * <span class="keyword">DIV</span> <span class="string">#2</span>.<span class="number">1.2</span>
+</ul>
+</blockquote>
+<h4 id="本次_TodoMVC_中对_View_的细分处理如下：">本次 TodoMVC 中对 View 的细分处理如下：</h4><ul>
+<li><p>AppView </p>
+<ul>
+<li><p>负责组合所有 APP 内的子 View「判断是否需要增加、显示或隐藏某个组件 View」</p>
+<pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+
+    <span class="comment">// 新建 footer 视图</span>
+    app.footerView = <span class="keyword">new</span> FooterView({
+        collection: app.todos
+    });
+
+    <span class="comment">// 新建 todolist 视图</span>
+    app.todoListView = <span class="keyword">new</span> TodoListView({
+        collection: app.todos
+    });
+},
+
+render           : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">this</span>.renderMain();
+    <span class="keyword">this</span>.renderFooter();
+},
+
+<span class="comment">//渲染 main 部分视图</span>
+renderMain       : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">if</span> (app.todos.length) {
+        <span class="keyword">this</span>.$list.append(app.todoListView.el);
+        <span class="keyword">this</span>.$main.show();
+
+        <span class="comment">// 设置批量操作按钮显示状态</span>
+        <span class="keyword">this</span>.toggleCheck();
+    } <span class="keyword">else</span> {
+        <span class="keyword">this</span>.$main.hide();
+    }
+},
+
+<span class="comment">// 渲染 footer 部分视图</span>
+renderFooter     : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">if</span> (app.todos.length) {
+        <span class="keyword">this</span>.$footer.append(app.footerView.el);
+        <span class="keyword">this</span>.$footer.show();
+    } <span class="keyword">else</span> {
+        <span class="keyword">this</span>.$footer.hide();
+    }
+},
+</code></pre></li>
+</ul>
+</li>
+<li>TodoView<ul>
+<li>负责每一个 Todo Item 的 View</li>
+</ul>
+</li>
+<li>TodoListView<ul>
+<li>负责一组 Todo Items 的 View</li>
+</ul>
+</li>
+<li>FooterView<ul>
+<li>负责 Footer 部分的 View</li>
+</ul>
+</li>
+</ul>
+<h3 id="关联数据层和_View_层">关联数据层和 View 层</h3><ul>
+<li><p>TodoView + Todo Model</p>
+<ul>
+<li><p>将 TodoView 的方法绑定到对应 Todo Model 的事件中</p>
+<pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.model, {
+        <span class="string">'change'</span> : <span class="keyword">this</span>.render,
+        <span class="string">'destroy'</span>: <span class="keyword">this</span>.remove,
+        <span class="string">'visible'</span>: <span class="keyword">this</span>.toggleVisible
+    });
+
+    <span class="keyword">this</span>.render();
+},
+</code></pre></li>
+<li><p>利用 Todo Model 的数据渲染 TodoView 的模板</p>
+<pre><code><span class="keyword">var</span> itemTpl = require('../../<span class="keyword">template</span>/item-tpl.ejs');
+<span class="keyword">var</span> <span class="type">TodoView</span> = <span class="type">Backbone</span>.<span class="type">View</span>.extend({
+    <span class="keyword">template</span>: itemTpl,
+    render       : function () {
+        ...
+
+        <span class="keyword">var</span> tmpl = this.<span class="keyword">template</span>(this.model.toJSON());
+        this.$el.html(tmpl);
+
+        ...
+        <span class="keyword">return</span> this;
+    },
+    ...
+)};
+</code></pre></li>
+<li><p>Todo View 中一些方法可以修改 Model 数据</p>
+<pre><code><span class="comment">// 改变 Model complete 状态</span>
+toggleCompleted: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">this</span>.model.toggleCompleted();
+},
+
+<span class="comment">// 清除 Model</span>
+clear         : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">this</span>.model.destroy();
+},
+</code></pre></li>
+</ul>
+</li>
+<li><p>TodoListView + Todos Collection</p>
+<ul>
+<li><p>将 TodoListView 的方法绑定到对应 Todos Collection 的事件中</p>
+<pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.collection, {
+        <span class="string">'add'</span>             : <span class="keyword">this</span>.addOne,
+        <span class="string">'reset'</span>           : <span class="keyword">this</span>.addAll,
+        <span class="string">'change:completed'</span>: <span class="keyword">this</span>.filterOne,
+        <span class="string">'filter'</span>          : <span class="keyword">this</span>.filterAll,
+        <span class="string">'destroy'</span>         : <span class="keyword">this</span>.render
+    });
+},
+</code></pre></li>
+<li><p>TodoListView 可以访问 Todos Collection, 从而间接访问其中的 Model</p>
+<pre><code>filterOne : <span class="function"><span class="keyword">function</span> <span class="params">(todo)</span> </span>{
+    todo.trigger(<span class="string">'visible'</span>);
+},
+filterAll : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">this</span>.collection.<span class="keyword">each</span>(<span class="keyword">this</span>.filterOne, <span class="keyword">this</span>);
+}
+</code></pre></li>
+</ul>
+</li>
+<li><p>FooterView + Todos Collection</p>
+<ul>
+<li><p>将 FooterView 的方法绑定到对应 Todos Collection 的事件中</p>
+<pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.collection, <span class="string">'add remove reset change:completed'</span>, <span class="keyword">this</span>.render);
+    <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.collection, <span class="string">'filter'</span>, <span class="keyword">this</span>.setSelectedTab);
+},
+</code></pre></li>
+<li><p>FooterView 可以访问 Todos Collection</p>
+<pre><code><span class="comment">// 清除已经完成的 todoitem</span>
+clearCompleted: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
+    _.invoke(<span class="keyword">this</span>.collection.completed(), <span class="string">'destroy'</span>);
+}
+</code></pre></li>
+<li><p>利用 Todos Collection 的数据渲染 FooterView</p>
+<pre><code><span class="keyword">var</span> footerTpl = require('../../<span class="keyword">template</span>/footer-tpl.ejs');
+
+<span class="keyword">var</span> <span class="type">FooterView</span> = <span class="type">Backbone</span>.<span class="type">View</span>.extend({
+    <span class="keyword">template</span>: footerTpl,
+    ...
+    render        : function () {
+
+        // 提取当前所绑定的 collection 数据的状态
+        <span class="keyword">var</span> remaining = this.collection.where({
+            completed: <span class="literal">false</span>
+        }).length;
+        <span class="keyword">var</span> completed = this.collection.where({
+            completed: <span class="literal">true</span>
+        }).length;
+
+        // 利用获取的 collection 数据渲染模板
+        <span class="keyword">var</span> footerView = this.<span class="keyword">template</span>({
+            remaining: remaining,
+            completed: completed
+        });
+
+        this.$el.html(footerView);
+
+        ...
+    },
+    ...
+});    
 </code></pre></li>
 </ul>
 </li>
 </ul>
-</blockquote>
-<ul>
-<li>绿色背景表示根元素「即<code>&lt;html&gt;</code>」产生的<code>Stacking Context</code></li>
-<li>颜色相同的元素表示它们同属于一个<code>Parent Stacking Context</code>，<code>Stacking Context</code>层次关系：</li>
-</ul>
-<blockquote>
-<ul>
-<li>Root<ul>
-<li>DIV #1</li>
-<li>DIV #1.1</li>
-<li>DIV #1.2 </li>
-<li>DIV #2<ul>
-<li>DIV #2.1<ul>
-<li>DIV 2.1.1</li>
-<li>DIV 2.1.2</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-</blockquote>
-<p>既然元素处于哪个<code>Parent Stacking Context</code>也会影响元素显示顺序，那么我们来看看元素的<code>Parent Stacking Context</code>是如何产生的：</p>
-<blockquote>
-<p>最外层的<code>Stacking Context</code>是根元素产生的，那么我们可以理解为它是所有元素的<code>Parent Stacking Context</code>。但当有新的<code>Stacking Context</code>产生时，这个新<code>Stacking Context</code>就是所有后代元素的<code>Parent Stacking Context</code>。以此类推，每当父元素产生一个新<code>Stacking Context</code>，就给后代元素提供了一个<code>Parent Stacking Context</code>。</p>
-</blockquote>
-<h3 id="产生新_Stacking_Context_的条件">产生新 Stacking Context 的条件</h3><ul>
-<li><code>Root element</code>「可以理解为第一个<code>Stacking Context</code>，用来包含其它的<code>Stacking Context</code>」</li>
-<li><code>Positioned</code>元素的<code>z-index</code>值不是<code>auto</code></li>
-<li>元素的<code>Opacity</code>值小于 1「可以看作是给普通元素增加了<code>Position</code>属性，且<code>z-index</code>值为 0「详细可见 <a href="http://www.w3.org/TR/css3-color/#transparency" target="_blank" rel="external">CSS Spec 2.1</a>」</li>
-<li>Chrome 22+ 和 Mobile WebKit,<code>z-index</code>值为<code>auto</code>的<code>fixed position</code>元素</li>
-</ul>
-<h2 id="Positioned_元素堆叠顺序规则">Positioned 元素堆叠顺序规则</h2><p>上面介绍了每一个<code>Stacking Context</code>内部元素的堆叠顺序，这里进一步详细介绍<code>Positioned</code>元素的堆叠顺序。</p>
-<h3 id="z-index_的作用">z-index 的作用</h3><p><code>Positioned</code>元素的堆叠顺序是由<code>z-index</code>决定的。<code>z-index</code>有2个作用：</p>
-<ol>
-<li>决定<code>Positioned</code>元素的<code>Stack Level</code>「可以理解为堆叠优先级，<code>Stack Level</code>值为整数，值大的放在上层」</li>
-<li>决定是否形成一个新的<code>Stacking Context</code></li>
-</ol>
-<h3 id="z-index_属性值">z-index 属性值</h3><p><code>z-index</code> 有两个属性值：<code>&lt;integer&gt;</code>和<code>&lt;auto&gt;</code>「注：只有<code>Positioned</code>元素的<code>Z-index</code>值才有效」。</p>
-<ul>
-<li><code>&lt;integer&gt;</code>：当<code>Z-index</code>设置了一个整数「负整数，零，正整数」时，<code>Positioned</code>元素就产生了一个新的<code>Stacking Context</code>，同时这个整数代表了当前元素的<code>Stack Level</code></li>
-<li><code>&lt;auto&gt;</code>：该值说明当前元素的<code>Stack Level</code>值为 0。但此时并没有产生新的<code>Stacking Context</code>，除非这个元素是个根元素「注：这里可以看出<code>z-index = auto</code>和<code>z-index = 0</code>的区别」</li>
-</ul>
-<h2 id="总结">总结</h2><ol>
-<li>任意一个元素都归属一个<code>Stacking Context</code>，<code>Stacking Context</code>可以互相嵌套，从而形成一个<code>Stacking Context</code>层级体系。「<code>Root element</code>是一个初始的<code>Stacking Context</code>，它包裹了其它的<code>Stacking Context</code>」</li>
-<li>在每一个<code>Stacking Context</code>内部，有特定堆叠优先级规则决定不同类型元素的堆叠顺序「<code>Positioned</code>元素的堆叠顺序由<code>z-index</code>值决定」</li>
-<li>当两个元素归属于不同的<code>Parent Stacking Context</code>时，它们的堆叠顺序互不干扰</li>
-</ol>
-<h3 id="参考资料">参考资料</h3><ol>
-<li><a href="http://www.w3.org/TR/CSS21/zindex.html" target="_blank" rel="external">http://www.w3.org/TR/CSS21/zindex.html</a></li>
-<li><a href="http://www.w3.org/TR/CSS21/visuren.html#layers" target="_blank" rel="external">http://www.w3.org/TR/CSS21/visuren.html#layers</a></li>
-<li><a href="http://www.w3.org/TR/css3-color/#transparency" target="_blank" rel="external">http://www.w3.org/TR/css3-color/#transparency</a></li>
-<li><a href="http://segmentfault.com/a/1190000000460664" target="_blank" rel="external">http://segmentfault.com/a/1190000000460664</a></li>
-<li><a href="http://gbspacing.com/z-index.gb" target="_blank" rel="external">http://gbspacing.com/z-index.gb</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index</a></li>
-</ol>
 
       
     </div>
@@ -260,7 +368,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/css/"> #css </a>
+            <a href="/tags/Backbone/"> #Backbone </a>
+          
+            <a href="/tags/JavaScript/"> #JavaScript </a>
+          
+            <a href="/tags/MVC/"> #MVC </a>
           
         </div>
       
@@ -269,11 +381,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/04/12/javascript-style-guide/">JavaScript Style Guide</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/04/12/javascript-style-guide/">JavaScript Style Guide</a>
             
           </div>
         </div>
@@ -289,8 +401,8 @@
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2014/08/30/stacking-context-analysis-of-element-in-z-axis/"
-               data-title="元素在 Z 轴方向上的堆叠顺序规则分析" data-url="mindspop.github.io/2014/08/30/stacking-context-analysis-of-element-in-z-axis/">
+          <div class="ds-thread" data-thread-key="2015/04/30/基于Backbone改造的TodoMVC介绍/"
+               data-title="基于 Backbone.js 改造的 TodoMVC 介绍" data-url="mindspop.github.io/2015/04/30/基于Backbone改造的TodoMVC介绍/">
           </div>
         
       </div>
@@ -403,7 +515,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Stacking_Context_介绍"><span class="nav-number">1.</span> <span class="nav-text">Stacking Context 介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Stacking_Context_的特性"><span class="nav-number">1.1.</span> <span class="nav-text">Stacking Context 的特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stacking_Context_内部元素排列顺序规则"><span class="nav-number">1.2.</span> <span class="nav-text">Stacking Context 内部元素排列顺序规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#归属于不同_Stacking_Context_的元素顺序比较"><span class="nav-number">1.3.</span> <span class="nav-text">归属于不同 Stacking Context 的元素顺序比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#产生新_Stacking_Context_的条件"><span class="nav-number">1.4.</span> <span class="nav-text">产生新 Stacking Context 的条件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Positioned_元素堆叠顺序规则"><span class="nav-number">2.</span> <span class="nav-text">Positioned 元素堆叠顺序规则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#z-index_的作用"><span class="nav-number">2.1.</span> <span class="nav-text">z-index 的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#z-index_属性值"><span class="nav-number">2.2.</span> <span class="nav-text">z-index 属性值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">3.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主要的改进"><span class="nav-number">1.</span> <span class="nav-text">主要的改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TodoMVC_架构分析"><span class="nav-number">2.</span> <span class="nav-text">TodoMVC 架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据层"><span class="nav-number">2.1.</span> <span class="nav-text">数据层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#View_层"><span class="nav-number">2.2.</span> <span class="nav-text">View 层</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#本次_TodoMVC_中对_View_的细分处理如下："><span class="nav-number">2.2.1.</span> <span class="nav-text">本次 TodoMVC 中对 View 的细分处理如下：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关联数据层和_View_层"><span class="nav-number">2.3.</span> <span class="nav-text">关联数据层和 View 层</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
