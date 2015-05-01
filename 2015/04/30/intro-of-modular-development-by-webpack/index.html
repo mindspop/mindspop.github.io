@@ -18,9 +18,9 @@
 
 
 
-	<meta name="keywords" content="Backbone,JavaScript,MVC," />
+	<meta name="keywords" content="modular development,webpack," />
 
-  <title> 基于 Backbone.js 改造的 TodoMVC 介绍 // Mindspop's Blog </title>
+  <title> 模块化开发之打包工具 Webpack 介绍 // Mindspop's Blog </title>
 </head>
 
 <body>
@@ -107,7 +107,7 @@
           
           
             
-              基于 Backbone.js 改造的 TodoMVC 介绍
+              模块化开发之打包工具 Webpack 介绍
             
           
         </h1>
@@ -115,14 +115,14 @@
 
       <div class="post-meta">
         <span class="post-time">
-          发表于 2015-04-29
+          发表于 2015-04-30
         </span>
 
         
           <span class="post-category">
             &nbsp; | &nbsp; 分类于
             
-              <a href="/categories/JavaScript-Tech/">JavaScript Tech</a>
+              <a href="/categories/Development-Management/">Development Management</a>
 
               
               
@@ -135,8 +135,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/04/30/基于Backbone改造的TodoMVC介绍/#comments" >
-              <span class="post-comments-count ds-thread-count" data-thread-key="2015/04/30/基于Backbone改造的TodoMVC介绍/"></span>
+            <a href="/2015/04/30/intro-of-modular-development-by-webpack/#comments" >
+              <span class="post-comments-count ds-thread-count" data-thread-key="2015/04/30/intro-of-modular-development-by-webpack/"></span>
             </a>
           </span>
           
@@ -150,216 +150,53 @@
       
 
       
-        <blockquote>
-<p>前提说明：本篇是在学习<code>Backbone</code>的时候，实战练习写了一个 TodoMVC，并在原有代码上基础做了部分改进工作。</p>
-</blockquote>
-<h2 id="主要的改进">主要的改进</h2><ul>
-<li>引入模块开发并使用<code>CommonJS</code>规范</li>
-<li>使用<code>Webpack</code>工具加载和打包模块</li>
-<li>将 HTML 模板独立成单一模块文件，同时让模块 JS 文件加载对应的 HTML 模板文件</li>
-<li>细化了<code>View</code>层的颗粒度，将 View 拆解成：AppView、FooterView、TodoView、TodoListView</li>
-<li>优化了 View 中<code>render</code>方法监听的事件类型，防止当<code>Model</code>或<code>Collection</code>发生一次变化时，View 多次重复渲染。「原例子中简单监听了<code>all</code>事件」<a id="more"></a>
-<img src="/2015/04/30/基于Backbone改造的TodoMVC介绍/todomvc_structure.png">
-</li>
+        <h1 id="1-_背景介绍">1. 背景介绍</h1><h2 id="前端开发的变化">前端开发的变化</h2><p>随着 Node.js 的兴起，越来越多的人使用 JavaScript 开发后台的一些应用。同时促进了<code>模块化开发</code>和<code>包管理</code>生态系统的发展。所以目前在国外，越来越多的人使用 CommonJS 规范来处理模块加载。但是为了能让代码在浏览器上能正常运行，我们需要在上线前，将相互依赖的模块整合打包到一个文件，这样就可以避免 CommonJS 同步加载的缺陷。</p>
+<h2 id="Browserify_的热捧">Browserify 的热捧</h2><p>最初在寻找打包工具时，发现大家都选择了 Browserify 这款打包工具。所以一开始我也毫不犹豫地选择了它。后来在使用过程中发现，Browserify 只能将所有文件打包成一个文件，如果需要分开打包，需要手动配置。那这样的打包方式，只适用如下一些场景：</p>
+<ul>
+<li>小规模网站，即代码量小</li>
+<li>很少更新网站，意味着业务代码很少更新</li>
+<li>不太关心第一次页面加载时长</li>
 </ul>
-<h2 id="TodoMVC_架构分析">TodoMVC 架构分析</h2><h3 id="数据层">数据层</h3><ol>
-<li>Todo <code>Model</code><ul>
-<li>存储每一个 Todo Item 的<code>标题</code>和<code>是否完成状态</code></li>
-<li>有一个业务逻辑方法：改变<code>是否完成状态</code></li>
+<p>这显然不太适应大部分网站的使用场景。</p>
+<h1 id="2-_从_Browserify_叛逃到_Webpack">2. 从 Browserify 叛逃到 Webpack</h1><a id="more"></a>
+<p>在实际使用过程中，我考虑到了一些代码合并优化的问题，比如是否可以将一些第三方库单独打包？不需要将所有代码打包到一个文件夹。是否可以分页面打包相关的代码？这些问题 Browserify 都不予理睬。后来又通过一些博文了解到 Webpack 这款打包工具。<br>在查阅官方文档和前人研究成果后，才发现 Webpack 是一款很强大的打包工具。它除了能能解决上面提到的几个问题，同时还支持其它一些特色功能。下面我来一一介绍一下这些功能：</p>
+<h2 id="Code_Splitting">Code Splitting</h2><ol>
+<li>打包时排出某个文件<ul>
+<li>当第三方库占整个打包文件的大小比例比较大，比如 20% 以上「When your vendors reaches a certain percentage of your total app bundle. Like 20% and up」</li>
+<li>经常会更新网站「You will do quite a few updates to your application」</li>
+<li>不太关心第一次页面加载时长，但是当你更新网站时，你关心优化回访用户的使用体验「You are not too concerned about perceived initial loading time, but you do have returning users and care about optimizing the experience when you do updates to the application」</li>
+<li>用户是通过手机访问的「Users are on mobile」</li>
 </ul>
 </li>
-<li>Todos <code>Collection</code><ul>
-<li>是一组 Todo Model 的集合</li>
-<li>负责 Todo 列表的排序</li>
-<li>负责过滤 Todo 列表中的数据「过滤剩余和完成的 Todo Item」 </li>
+<li>分多个入口打包文件，并提取多个合并文件中的共同文件<ul>
+<li>网站有多个独立的体验部分，但是它们共享大部分代码「You have an application with multiple isolated user experiences, but they share a lot of code」</li>
+<li>有一个使用较少组件的移动版本「You have a mobile version using less components」</li>
+<li>是一个典型的用户前台和后台应用网站，你不想在普通用户访问时加载后台的代码「You have a typical user/admin application where you do not want to load all the admin code for a normal user」</li>
+</ul>
+</li>
+<li>在某个文件中设置异步加载某些模块<ul>
+<li>网站规模很大，用户可以访问不同的部分「You have a relatively big application where users can visit different parts of it」</li>
+<li>很在意第一次页面渲染时间「You do care a lot about initial render time」</li>
 </ul>
 </li>
 </ol>
-<h3 id="View_层">View 层</h3><p>尽可能最小粒度地划分 View，即保证每个独立的 View 对应一个 Model 或 Collection。复杂的 View 由简单的 View 组合而成。这样可以提高开发灵活性，也有利于后期维度。<br>这种细分 View 的方式可以理解为：</p>
-<pre><code>1. <span class="keyword">view</span>-a1 + <span class="keyword">view</span>-a2 = <span class="keyword">view</span>-a
-2. <span class="keyword">view</span>-b1 + <span class="keyword">view</span>-b2 + <span class="keyword">view</span>-b3 + <span class="keyword">view</span>-b4 = <span class="keyword">view</span>-b
-3. <span class="keyword">view</span>-a + <span class="keyword">view</span>-b + <span class="keyword">view</span>-c = <span class="keyword">view</span>-<span class="literal">d</span>
-</code></pre><p>这种划分的规则:</p>
-<blockquote>
+<p>以上这些功能覆盖了大部分的使用场景。</p>
+<h2 id="静态资源模块化加载">静态资源模块化加载</h2><p>我们可以把一些静态资源「Img、CSS、Font、HTML Template 等」组合打包到一个文件，实现组件化开发。</p>
+<h2 id="编译文件">编译文件</h2><p>目前我们习惯用 SCSS 或 LESS 来写 CSS，用 CoffeeScript 写 JavaScript，还有 React 的 JSX 语法。<br>Webpack 提供了 sass-loader，coffee-loader, jsx-loader 等插件，当加载这些格式的模块文件时，会先执行编译，最后把编译结果引入指定文件。</p>
+<h2 id="插件">插件</h2><p>Webpack 提供了很多插件，比如 UglifyJsPlugin，用来压缩 JS。更多插件可以看<a href="http://webpack.github.io/docs/list-of-plugins.html" target="_blank" rel="external">这里</a></p>
+<h2 id="Sever_服务并提供类似_Liveload_功能">Sever 服务并提供类似 Liveload 功能</h2><p>Webpack 能开启一个本地 Sever，同时监听各打包文件，当某个文件发生变动时，会重新打包。同时利用它提供的 Hot Mode 功能，能实现类似 Liveload 效果，具体表现如下：</p>
 <ul>
-<li>每一个最小单位的 View 都只负责处理自身的内容</li>
-<li>由其它子 View 组合而成的 View 则负责统筹更小单位的 View「通常父层级的 View 负责创建、显示、隐藏或删除子级别 View」<ul>
-<li>View 与 View 之间的通信，则依靠 Model 或 Collection 这个中间体「比如用户操作某个 View1 而影响另外一个 View2，代码实现上是通过修改 View2 对应的数据层来间接刷新 View2」</li>
+<li>CSS 变化时，<code>不用刷新页面</code>就能更新内容</li>
+<li>JSX Component 变化时，不用刷新页面就能更新内容</li>
+<li>某个 JS 文件变动时，会自动重新打包并刷新页面</li>
 </ul>
-</li>
-</ul>
-</blockquote>
-<h4 id="本次_TodoMVC_中对_View_的细分处理如下：">本次 TodoMVC 中对 View 的细分处理如下：</h4><ol>
-<li><p>AppView</p>
-<ul>
-<li><p>负责组合所有 APP 内的子 View「判断是否需要增加、显示或隐藏某个组件 View」</p>
-<pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-
-    <span class="comment">// 新建 footer 视图</span>
-    app.footerView = <span class="keyword">new</span> FooterView({
-        collection: app.todos
-    });
-
-    <span class="comment">// 新建 todolist 视图</span>
-    app.todoListView = <span class="keyword">new</span> TodoListView({
-        collection: app.todos
-    });
-},
-
-render           : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">this</span>.renderMain();
-    <span class="keyword">this</span>.renderFooter();
-},
-
-<span class="comment">//渲染 main 部分视图</span>
-renderMain       : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">if</span> (app.todos.length) {
-        <span class="keyword">this</span>.$list.append(app.todoListView.el);
-        <span class="keyword">this</span>.$main.show();
-
-        <span class="comment">// 设置批量操作按钮显示状态</span>
-        <span class="keyword">this</span>.toggleCheck();
-    } <span class="keyword">else</span> {
-        <span class="keyword">this</span>.$main.hide();
-    }
-},
-
-<span class="comment">// 渲染 footer 部分视图</span>
-renderFooter     : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">if</span> (app.todos.length) {
-        <span class="keyword">this</span>.$footer.append(app.footerView.el);
-        <span class="keyword">this</span>.$footer.show();
-    } <span class="keyword">else</span> {
-        <span class="keyword">this</span>.$footer.hide();
-    }
-},
-</code></pre></li>
-</ul>
-</li>
-<li>TodoView<ul>
-<li>负责每一个 Todo Item 的 View</li>
-</ul>
-</li>
-<li>TodoListView<ul>
-<li>负责一组 Todo Items 的 View</li>
-</ul>
-</li>
-<li>FooterView<ul>
-<li>负责 Footer 部分的 View</li>
-</ul>
-</li>
-</ol>
-<h3 id="关联数据层和_View_层">关联数据层和 View 层</h3><ol>
-<li><p>TodoView + Todo Model</p>
-<ul>
-<li><p>将 TodoView 的方法绑定到对应 Todo Model 的事件中</p>
-<pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.model, {
-        <span class="string">'change'</span> : <span class="keyword">this</span>.render,
-        <span class="string">'destroy'</span>: <span class="keyword">this</span>.remove,
-        <span class="string">'visible'</span>: <span class="keyword">this</span>.toggleVisible
-    });
-
-    <span class="keyword">this</span>.render();
-},
-</code></pre></li>
-<li><p>利用 Todo Model 的数据渲染 TodoView 的模板</p>
-<pre><code><span class="keyword">var</span> itemTpl = require('../../<span class="keyword">template</span>/item-tpl.ejs');
-<span class="keyword">var</span> <span class="type">TodoView</span> = <span class="type">Backbone</span>.<span class="type">View</span>.extend({
-    <span class="keyword">template</span>: itemTpl,
-    render       : function () {
-        ...
-
-        <span class="keyword">var</span> tmpl = this.<span class="keyword">template</span>(this.model.toJSON());
-        this.$el.html(tmpl);
-
-        ...
-        <span class="keyword">return</span> this;
-    },
-    ...
-)};
-</code></pre></li>
-<li><p>Todo View 中一些方法可以修改 Model 数据</p>
-<pre><code><span class="comment">// 改变 Model complete 状态</span>
-toggleCompleted: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">this</span>.model.toggleCompleted();
-},
-
-<span class="comment">// 清除 Model</span>
-clear         : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">this</span>.model.destroy();
-},
-</code></pre></li>
-</ul>
-</li>
-<li><p>TodoListView + Todos Collection</p>
-<ul>
-<li><p>将 TodoListView 的方法绑定到对应 Todos Collection 的事件中</p>
-<pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.collection, {
-        <span class="string">'add'</span>             : <span class="keyword">this</span>.addOne,
-        <span class="string">'reset'</span>           : <span class="keyword">this</span>.addAll,
-        <span class="string">'change:completed'</span>: <span class="keyword">this</span>.filterOne,
-        <span class="string">'filter'</span>          : <span class="keyword">this</span>.filterAll,
-        <span class="string">'destroy'</span>         : <span class="keyword">this</span>.render
-    });
-},
-</code></pre></li>
-<li><p>TodoListView 可以访问 Todos Collection, 从而间接访问其中的 Model</p>
-<pre><code>filterOne : <span class="function"><span class="keyword">function</span> <span class="params">(todo)</span> </span>{
-    todo.trigger(<span class="string">'visible'</span>);
-},
-filterAll : <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">this</span>.collection.<span class="keyword">each</span>(<span class="keyword">this</span>.filterOne, <span class="keyword">this</span>);
-}
-</code></pre></li>
-</ul>
-</li>
-<li><p>FooterView + Todos Collection</p>
-<ul>
-<li><p>将 FooterView 的方法绑定到对应 Todos Collection 的事件中</p>
-<pre><code>initialize: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.collection, <span class="string">'add remove reset change:completed'</span>, <span class="keyword">this</span>.render);
-    <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.collection, <span class="string">'filter'</span>, <span class="keyword">this</span>.setSelectedTab);
-},
-</code></pre></li>
-<li><p>FooterView 可以访问 Todos Collection</p>
-<pre><code><span class="comment">// 清除已经完成的 todoitem</span>
-clearCompleted: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{
-    _.invoke(<span class="keyword">this</span>.collection.completed(), <span class="string">'destroy'</span>);
-}
-</code></pre></li>
-<li><p>利用 Todos Collection 的数据渲染 FooterView</p>
-<pre><code><span class="keyword">var</span> footerTpl = require('../../<span class="keyword">template</span>/footer-tpl.ejs');
-
-<span class="keyword">var</span> <span class="type">FooterView</span> = <span class="type">Backbone</span>.<span class="type">View</span>.extend({
-    <span class="keyword">template</span>: footerTpl,
-    ...
-    render        : function () {
-
-        // 提取当前所绑定的 collection 数据的状态
-        <span class="keyword">var</span> remaining = this.collection.where({
-            completed: <span class="literal">false</span>
-        }).length;
-        <span class="keyword">var</span> completed = this.collection.where({
-            completed: <span class="literal">true</span>
-        }).length;
-
-        // 利用获取的 collection 数据渲染模板
-        <span class="keyword">var</span> footerView = this.<span class="keyword">template</span>({
-            remaining: remaining,
-            completed: completed
-        });
-
-        this.$el.html(footerView);
-
-        ...
-    },
-    ...
-});    
-</code></pre></li>
-</ul>
-</li>
+<h1 id="3-_结语">3. 结语</h1><p>除了这些，Webpack 还提供了一些高级的功能。具体可以查看它的<a href="http://webpack.github.io/docs/" target="_blank" rel="external">官网文档</a>。但是目前来说，Webpack 不是 Gulp 的替代品，它们俩可以互相配合，发挥你的想象力，来提高前端开发的效率吧。</p>
+<p>参考资料：</p>
+<ol>
+<li><a href="http://webpack.github.io/docs/" target="_blank" rel="external">Webpack doc</a></li>
+<li><a href="http://christianalfoni.github.io/react-webpack-cookbook/Requiring-files.html" target="_blank" rel="external">React-webpack-cookbook</a></li>
+<li><a href="https://github.com/petehunt/webpack-howto" target="_blank" rel="external">Webpack-how-to</a></li>
+<li><a href="http://segmentfault.com/a/1190000002551952" target="_blank" rel="external">Webpack 入门指迷</a></li>
 </ol>
 
       
@@ -369,11 +206,9 @@ clearCompleted: <span class="function"><span class="keyword">function</span> <sp
       
         <div class="post-tags">
           
-            <a href="/tags/Backbone/"> #Backbone </a>
+            <a href="/tags/modular-development/"> #modular development </a>
           
-            <a href="/tags/JavaScript/"> #JavaScript </a>
-          
-            <a href="/tags/MVC/"> #MVC </a>
+            <a href="/tags/webpack/"> #webpack </a>
           
         </div>
       
@@ -382,13 +217,11 @@ clearCompleted: <span class="function"><span class="keyword">function</span> <sp
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/04/30/intro-of-modular-development-by-webpack/">模块化开发之打包工具 Webpack 介绍</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/04/12/javascript-style-guide/">JavaScript Style Guide</a>
+              <a href="/2015/04/30/基于Backbone改造的TodoMVC介绍/">基于 Backbone.js 改造的 TodoMVC 介绍</a>
             
           </div>
         </div>
@@ -404,8 +237,8 @@ clearCompleted: <span class="function"><span class="keyword">function</span> <sp
     
       <div class="comments" id="comments">
         
-          <div class="ds-thread" data-thread-key="2015/04/30/基于Backbone改造的TodoMVC介绍/"
-               data-title="基于 Backbone.js 改造的 TodoMVC 介绍" data-url="mindspop.github.io/2015/04/30/基于Backbone改造的TodoMVC介绍/">
+          <div class="ds-thread" data-thread-key="2015/04/30/intro-of-modular-development-by-webpack/"
+               data-title="模块化开发之打包工具 Webpack 介绍" data-url="mindspop.github.io/2015/04/30/intro-of-modular-development-by-webpack/">
           </div>
         
       </div>
@@ -518,7 +351,7 @@ clearCompleted: <span class="function"><span class="keyword">function</span> <sp
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主要的改进"><span class="nav-number">1.</span> <span class="nav-text">主要的改进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TodoMVC_架构分析"><span class="nav-number">2.</span> <span class="nav-text">TodoMVC 架构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据层"><span class="nav-number">2.1.</span> <span class="nav-text">数据层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#View_层"><span class="nav-number">2.2.</span> <span class="nav-text">View 层</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#本次_TodoMVC_中对_View_的细分处理如下："><span class="nav-number">2.2.1.</span> <span class="nav-text">本次 TodoMVC 中对 View 的细分处理如下：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关联数据层和_View_层"><span class="nav-number">2.3.</span> <span class="nav-text">关联数据层和 View 层</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-_背景介绍"><span class="nav-number">1.</span> <span class="nav-text">1. 背景介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前端开发的变化"><span class="nav-number">1.1.</span> <span class="nav-text">前端开发的变化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Browserify_的热捧"><span class="nav-number">1.2.</span> <span class="nav-text">Browserify 的热捧</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-_从_Browserify_叛逃到_Webpack"><span class="nav-number">2.</span> <span class="nav-text">2. 从 Browserify 叛逃到 Webpack</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Code_Splitting"><span class="nav-number">2.1.</span> <span class="nav-text">Code Splitting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态资源模块化加载"><span class="nav-number">2.2.</span> <span class="nav-text">静态资源模块化加载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译文件"><span class="nav-number">2.3.</span> <span class="nav-text">编译文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插件"><span class="nav-number">2.4.</span> <span class="nav-text">插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sever_服务并提供类似_Liveload_功能"><span class="nav-number">2.5.</span> <span class="nav-text">Sever 服务并提供类似 Liveload 功能</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-_结语"><span class="nav-number">3.</span> <span class="nav-text">3. 结语</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>

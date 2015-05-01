@@ -3,8 +3,31 @@
 
     
   <url>
+    <loc>mindspop.github.io/2015/04/30/intro-of-modular-development-by-webpack/</loc>
+    <lastmod>2015-05-01T03:34:45.000Z</lastmod>
+    <data>
+        <display>
+        <title>模块化开发之打包工具 Webpack 介绍</title>
+        <pubTime>2015-04-30T14:58:56.000Z</pubTime>
+        
+        <tag>modular development </tag>
+         
+        <tag>webpack </tag>
+         
+         
+           
+             
+              <breadCrumb title="Development Management" url="mindspop.github.io/categories/Development-Management/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+    
+  <url>
     <loc>mindspop.github.io/2015/04/30/%E5%9F%BA%E4%BA%8EBackbone%E6%94%B9%E9%80%A0%E7%9A%84TodoMVC%E4%BB%8B%E7%BB%8D/</loc>
-    <lastmod>2015-04-30T11:08:54.000Z</lastmod>
+    <lastmod>2015-04-30T14:56:47.000Z</lastmod>
     <data>
         <display>
         <title>基于 Backbone.js 改造的 TodoMVC 介绍</title>
@@ -28,7 +51,7 @@
     
   <url>
     <loc>mindspop.github.io/2015/04/12/javascript-style-guide/</loc>
-    <lastmod>2015-04-30T10:36:24.000Z</lastmod>
+    <lastmod>2015-04-30T14:56:47.000Z</lastmod>
     <data>
         <display>
         <title>JavaScript Style Guide</title>
@@ -66,7 +89,6 @@
     </data>
     </url>
 
-    
     
     
 </urlset>
