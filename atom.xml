@@ -4,7 +4,7 @@
   <subtitle><![CDATA[a blog recording something in mind]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="mindspop.github.io/"/>
-  <updated>2015-05-01T03:34:45.000Z</updated>
+  <updated>2015-05-01T07:48:40.000Z</updated>
   <id>mindspop.github.io/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="mindspop.github.io/2015/04/30/intro-of-modular-development-by-webpack/"/>
     <id>mindspop.github.io/2015/04/30/intro-of-modular-development-by-webpack/</id>
     <published>2015-04-30T14:58:56.000Z</published>
-    <updated>2015-05-01T03:34:45.000Z</updated>
+    <updated>2015-05-01T07:48:40.000Z</updated>
     <content type="html"><![CDATA[<h1 id="1-_背景介绍">1. 背景介绍</h1><h2 id="前端开发的变化">前端开发的变化</h2><p>随着 Node.js 的兴起，越来越多的人使用 JavaScript 开发后台的一些应用。同时促进了<code>模块化开发</code>和<code>包管理</code>生态系统的发展。所以目前在国外，越来越多的人使用 CommonJS 规范来处理模块加载。但是为了能让代码在浏览器上能正常运行，我们需要在上线前，将相互依赖的模块整合打包到一个文件，这样就可以避免 CommonJS 同步加载的缺陷。</p>
 <h2 id="Browserify_的热捧">Browserify 的热捧</h2><p>最初在寻找打包工具时，发现大家都选择了 Browserify 这款打包工具。所以一开始我也毫不犹豫地选择了它。后来在使用过程中发现，Browserify 只能将所有文件打包成一个文件，如果需要分开打包，需要手动配置。那这样的打包方式，只适用如下一些场景：</p>
 <ul>
