@@ -130,6 +130,35 @@
 <blockquote>
 <p><a href="https://github.com/mindspop/todoMVC_Backbone_CommonJS" target="_blank" rel="external">开源代码</a>——-<a href="http://mindspop.github.io/project/todoMVC">线上预览</a></p>
 </blockquote>
+<h2 id="2-_基于_Backbone_的_定制版_2048_游戏">2. 基于 Backbone 的 定制版 2048 游戏</h2><p>本项目改编了原始的 2048 显示，分为 IT 民工、建筑师和打酱油三种角色，增加了一定趣味性。</p>
+<ul>
+<li>Router 管理<ul>
+<li>游戏有三个角色，角色切换靠 Router 来实现，每一个 Hash 值对应一个角色，当 Hash 值改变时，重新渲染游戏主界面</li>
+</ul>
+</li>
+<li>View 管理：<ul>
+<li>AppView 统筹所有 View：StartView 负责开始界面，MainView 负责游戏界面方块部分界面，HeaderView 负责游戏界面标题部分界面，GridView 负责每一个小方块界面，GameOverView 负责游戏结束提示界面</li>
+<li>三个游戏角色共享所有的 View，当用户切换角色时重新读取对应角色游戏的数据，从而渲染新的 View</li>
+</ul>
+</li>
+<li>数据管理：<ul>
+<li>GridModel 负责管理小方块的数据</li>
+<li>GridsCollection 负责管理所有小方块的位置</li>
+<li>HeaderModel 负责管理游戏名称和游戏得分数据</li>
+<li>三个游戏角色各自拥有一个独立的 GridsCollection 和 HeaderModel，保证在切换游戏角色时保留原来的数据</li>
+</ul>
+</li>
+<li>开发理念<ul>
+<li>引入模块开发并使用<code>CommonJS</code>规范</li>
+<li>使用<code>Webpack</code>工具加载、打包和压缩 JS 模块文件，最后打包成 bundle-app.js 和 vender.js 文件，后者都是各种第三方库</li>
+<li>将<code>HTML</code>模板独立成单一模块文件，同时让模块 JS 文件加载对应的 HTML 模板文件，提前解析模板，减少客户端渲染模板时间</li>
+<li>采用<code>SCSS</code>模块开发理念，将 CSS 拆分成模块单独开发，最后使用<code>Gulp</code>工具自动编译、打包和压缩 CSS「觉得内置 CSS 的方式不适合本项目，所以这里了没有使用 Webpack 引入 SCSS」</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><a href="https://github.com/mindspop/2048_Game" target="_blank" rel="external">开源代码</a>——-<a href="http://mindspop.github.io/project/2048/">线上预览</a></p>
+</blockquote>
 
     
   </div>
